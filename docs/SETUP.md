@@ -29,18 +29,21 @@ In the Cloud Console (<https://console.cloud.google.com>):
 2. Open <https://console.cloud.google.com/apis/library/aiplatform.googleapis.com>, make sure the new project is
    selected, click **Enable**.
 
-### 3. Create a key for the app
-1. **IAM & Admin → Service accounts → Create service account**. Name: `fitting-room`.
-2. Grant role **Vertex AI User** → Done.
-3. Open the service account → **Keys → Add key → Create new key → JSON**. A `.json` file downloads.
-4. Put it in `.env` as **one line**:
-   ```bash
-   # from the repo folder, replace the path with your downloaded file:
-   echo "GOOGLE_APPLICATION_CREDENTIALS_JSON=$(tr -d '\n' < ~/Downloads/immerse-fitting-room-xxxx.json)" >> .env
-   ```
-   Then delete the downloaded file or keep it out of the repo. Share it with teammates privately (not on GitHub
-   or Slack channels).
-5. In `.env` also set `GOOGLE_CLOUD_PROJECT=<your project id>` and leave `GOOGLE_CLOUD_LOCATION=global`.
+### 3. Log the app in (laptop)
+New Google Cloud organizations usually block downloading service-account keys, so locally the app uses your own
+Google login, stored in its own folder so it doesn't touch any other gcloud login on your machine:
+```bash
+CLOUDSDK_CONFIG=$HOME/.config/gcloud-fitting-room gcloud auth application-default login
+CLOUDSDK_CONFIG=$HOME/.config/gcloud-fitting-room gcloud auth application-default set-quota-project YOUR_PROJECT_ID
+```
+Then in `.env`:
+```
+GOOGLE_CLOUD_PROJECT=YOUR_PROJECT_ID
+GOOGLE_CLOUD_LOCATION=global
+GOOGLE_APPLICATION_CREDENTIALS=/Users/<you>/.config/gcloud-fitting-room/application_default_credentials.json
+```
+For deploying (Vercel) a service-account key is needed instead (`GOOGLE_APPLICATION_CREDENTIALS_JSON`); that
+requires turning off the "Disable service account key creation" org policy first.
 
 ### 4. Budget alert (recommended)
 **Billing → Budgets & alerts → Create budget**, $20, alerts at 50/90/100%.
@@ -51,9 +54,10 @@ npm run dev
 curl -s -X POST localhost:3000/api/avatar -H 'content-type: application/json' \
   -d '{"description":"woman in her 20s with curly black hair"}' | head -c 200
 ```
-You should see `{"image":"data:image/png;base64,...`. If you see a "model not found" error, open
-**Vertex AI → Model Garden**, search "Gemini Flash Image", and put the exact model ID it shows in
-`GEMINI_IMAGE_MODEL` in `.env` (try `GOOGLE_CLOUD_LOCATION=us-central1` if `global` doesn't list it).
+You should see `{"image":"data:image/png;base64,...`. If you see a "model not found" error, the model ID is
+unavailable to your project: set `GEMINI_IMAGE_MODEL` / `GEMINI_TEXT_MODEL` in `.env` to one that is
+(tested working Nov 2026: `gemini-2.5-flash-image` for images, `gemini-3.8-flash` for text;
+`gemini-2.5-flash` returns 404 on new projects).
 
 ## Running on the Quest 2
 The Quest Browser needs HTTPS (or `localhost`) for WebXR and the mic.

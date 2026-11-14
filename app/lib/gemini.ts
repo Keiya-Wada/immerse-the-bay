@@ -10,7 +10,7 @@ import { GoogleGenAI, type Part } from "@google/genai";
 // See docs/SETUP.md.
 
 const IMAGE_MODEL = process.env.GEMINI_IMAGE_MODEL ?? "gemini-2.5-flash-image";
-const TEXT_MODEL = process.env.GEMINI_TEXT_MODEL ?? "gemini-2.5-flash";
+const TEXT_MODEL = process.env.GEMINI_TEXT_MODEL ?? "gemini-3.8-flash";
 
 let client: GoogleGenAI | null = null;
 

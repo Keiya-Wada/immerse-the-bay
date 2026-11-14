@@ -53,7 +53,8 @@ export async function POST(req: Request) {
               "Edit image 1 so the person is wearing the clothing item from image 2, replacing only the matching part of their outfit. " +
               "Reproduce the item exactly: same color, pattern, fabric texture, cut, length, logos and details. Fit it naturally to their body. " +
               "Keep the person's face, hair, skin, body shape and pose, the background, the lighting and the camera framing unchanged. " +
-              "Full body visible head to shoes. Photorealistic. 16:9 landscape." +
+              "Full body visible head to shoes. Photorealistic. 16:9 landscape. " +
+              "Ignore any brand logos, watermarks, size labels or text overlaid on image 2; add no text or logos to the image." +
               (notes ? ` Notes: ${notes}` : ""),
           },
         ]
