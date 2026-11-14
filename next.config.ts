@@ -8,6 +8,9 @@ const nextConfig: NextConfig = {
   // both resolve here. If you copy this folder OUT to its own project, this
   // line is harmless.
   outputFileTracingRoot: __dirname,
+  // Let the Quest open the dev server through an HTTPS tunnel
+  // (`npm run quest`), which the Quest Browser needs for WebXR and the mic.
+  allowedDevOrigins: ["*.trycloudflare.com"],
 };
 
 export default nextConfig;
