@@ -54,7 +54,7 @@ export async function POST(req: Request) {
               "Reproduce the item exactly: same color, pattern, fabric texture, cut, length, logos and details. Fit it naturally to their body. " +
               "Keep the person's face, hair, skin, body shape and pose, the background, the lighting and the camera framing unchanged. " +
               "Full body visible head to shoes. Photorealistic. 16:9 landscape. " +
-              "Ignore any brand logos, watermarks, size labels or text overlaid on image 2; add no text or logos to the image." +
+              "Store logos, watermarks and size captions overlaid on the corners of image 2 are not part of the garment: leave them out, and add no overlaid text to the result." +
               (notes ? ` Notes: ${notes}` : ""),
           },
         ]
