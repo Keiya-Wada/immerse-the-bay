@@ -24,6 +24,9 @@ dist/
 __pycache__/
 .venv/
 .next/
+.next-dev/
+# Saved closet + avatar (local data, may contain personal photos)
+data/
 next-env.d.ts.bak
 *.tsbuildinfo
 .vercel

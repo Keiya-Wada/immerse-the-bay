@@ -1,15 +1,22 @@
 import { NextResponse } from "next/server";
-import { errorMessage, generateImage, inlineToDataUrl } from "../../lib/gemini";
+import { asQuality, errorMessage, generateImage, inlineToDataUrl } from "../../lib/gemini";
+import { loadAvatar, saveAvatar } from "../../lib/wardrobe";
 
+// GET → { avatar: { image, description } | null }   (the last one created, saved on the server)
 // POST { description: "woman in her 30s, curly black hair, tall" }
-// → { image: dataUrl (16:9), description }
+// → { image: dataUrl (16:9), description }   (and saves it)
 //
 // The avatar is generated once, in a plain neutral outfit, and becomes the
 // base photo every garment is "tried on" to.
 export const maxDuration = 60;
+export const dynamic = "force-dynamic";
+
+export async function GET() {
+  return Response.json({ avatar: await loadAvatar() });
+}
 
 export async function POST(req: Request) {
-  const { description } = (await req.json().catch(() => ({}))) as { description?: string };
+  const { description, quality } = (await req.json().catch(() => ({}))) as { description?: string; quality?: string };
   const desc = description?.trim();
   if (!desc) return NextResponse.json({ error: "Describe the avatar first." }, { status: 400 });
 
@@ -23,8 +30,10 @@ export async function POST(req: Request) {
   ].join(" ");
 
   try {
-    const img = await generateImage([{ text: prompt }]);
-    return NextResponse.json({ image: inlineToDataUrl(img), description: desc });
+    const img = await generateImage([{ text: prompt }], asQuality(quality));
+    const avatar = { image: inlineToDataUrl(img), description: desc };
+    await saveAvatar(avatar).catch(() => undefined); // read-only disk (e.g. Vercel): just don't persist
+    return NextResponse.json(avatar);
   } catch (e) {
     return NextResponse.json({ error: errorMessage(e) }, { status: 502 });
   }

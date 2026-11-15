@@ -11,6 +11,9 @@ const nextConfig: NextConfig = {
   // Let the Quest open the dev server through an HTTPS tunnel
   // (`npm run quest`), which the Quest Browser needs for WebXR and the mic.
   allowedDevOrigins: ["*.trycloudflare.com"],
+  // A second dev server (`npm run dev:test`, port 3001) can run next to the production
+  // server without the two overwriting each other's build output.
+  distDir: process.env.NEXT_DIST_DIR || ".next",
 };
 
 export default nextConfig;

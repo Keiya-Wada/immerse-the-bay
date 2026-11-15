@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { postJson, useCloset } from "../lib/closet";
 
 const EXAMPLES = [
@@ -16,11 +16,16 @@ export function AvatarPanel() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // The saved avatar arrives after the first render: show its description.
+  useEffect(() => {
+    if (avatar?.description) setText((t) => t || avatar.description);
+  }, [avatar?.description]);
+
   async function generate() {
     setBusy(true);
     setError(null);
     try {
-      const r = await postJson<{ image: string; description: string }>("/api/avatar", { description: text });
+      const r = await postJson<{ image: string; description: string }>("/api/avatar", { description: text, quality: useCloset.getState().quality });
       setAvatar({ image: r.image, description: r.description });
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));

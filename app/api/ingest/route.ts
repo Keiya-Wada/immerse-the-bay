@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import { errorMessage } from "../../lib/gemini";
 
 // POST { url } → { title, description, image: dataUrl, sourceUrl }
 //
@@ -28,7 +27,13 @@ export async function POST(req: Request) {
 
   try {
     const res = await fetch(page, { headers: { "User-Agent": UA, Accept: "text/html" }, redirect: "follow" });
-    if (!res.ok) throw new Error(`The store returned ${res.status}. Try uploading a photo instead.`);
+    if (!res.ok) {
+      const why =
+        res.status === 429 || res.status === 403 || res.status === 503
+          ? `${page.hostname} blocked the request (its bot protection, error ${res.status}).`
+          : `${page.hostname} returned error ${res.status}.`;
+      throw new Error(`${why} Copy the product photo on that page and paste it here (⌘V) instead.`);
+    }
     const html = await res.text();
 
     const product = fromJsonLd(html);
@@ -45,7 +50,10 @@ export async function POST(req: Request) {
       sourceUrl: page.toString(),
     });
   } catch (e) {
-    return NextResponse.json({ error: errorMessage(e) }, { status: 502 });
+    // This route never calls Gemini: report the store's own error as is.
+    const msg = e instanceof Error ? e.message : String(e);
+    console.error(`[ingest] ${page.hostname}: ${msg}`);
+    return NextResponse.json({ error: msg }, { status: 502 });
   }
 }
 

@@ -32,7 +32,7 @@ import {
 //
 // Don't bind main_audio to a second hidden <audio> element: that
 // double-plays the track and gives the user no unmute affordance.
-export function Video() {
+export function Video({ audio = true }: { audio?: boolean } = {}) {
   const [priming, setPriming] = useState(false);
   const videoTrack = useVideoTrack();
 
@@ -65,7 +65,7 @@ export function Video() {
       <MainVideoView
         className="h-full w-full"
         videoObjectFit="contain"
-        audioTrack="main_audio"
+        audioTrack={audio ? "main_audio" : undefined}
       />
       {showPriming && (
         <div className="pointer-events-none absolute inset-0 grid place-items-center bg-black/60">
@@ -80,7 +80,7 @@ export function Video() {
           </div>
         </div>
       )}
-      <AudioUnlock />
+      {audio && <AudioUnlock />}
     </div>
   );
 }
