@@ -61,6 +61,8 @@ Setup: [docs/SETUP.md](docs/SETUP.md). Plan and notes from earlier ideas: [docs/
   scene cuts to a new shot), keep the person on the spot, and move slowly. It's still not fully reliable:
   big moves can lose parts of the outfit.
 - Steering presses during a change are queued (the latest wins), not ignored; failures are shown.
+- Once the video is live, any outfit change (Try on / Add to outfit, take off, redo, a saved look, voice) goes onto
+  the live double by itself as soon as the photo is ready (~10–20 s); no need to press Restart live.
 - Two status lines on the desk show whether the video is live (fps, resolution, stalls) and what happened
   to the last steer. If frames stop for 5 s while the stream is live, the video element is rebuilt.
 - Orbis runs as much as possible: the video starts by itself once you connect (the avatar as is, or the

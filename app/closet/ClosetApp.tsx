@@ -76,11 +76,8 @@ function Closet() {
       },
       pause: () => void sendPause(s).catch(() => undefined),
       resume: () => void sendResume(s).catch(() => undefined),
-      // A new outfit from voice goes straight onto the live video when it's connected.
-      outfitChanged: () => {
-        const outfit = useCloset.getState().outfit;
-        if (live.current.canWear && outfit.length) live.current.wear(outfit);
-      },
+      // A new outfit from voice reaches the live video through the follow-outfit effect below.
+      outfitChanged: () => {},
     });
     return () => registerVoiceActions(null);
   }, [s]);
@@ -126,6 +123,21 @@ function Closet() {
     autoStarted.current = true;
     void live.current.wear(useCloset.getState().outfit);
   }, [ready, avatar, snap, switching]);
+
+  // Follow the outfit: once the video has started, any change to the outfit (put on, take
+  // off, redo, a saved look, voice) goes onto the live double as soon as dressing finishes,
+  // without pressing "Restart live". A change made while a switch is running is picked up
+  // when it ends.
+  const outfit = useCloset((st) => st.outfit);
+  const dressing = useCloset((st) => !!st.busy);
+  const started = !!snap?.started;
+  useEffect(() => {
+    if (!ready || switching || dressing || !started || !worn.current) return;
+    const w = worn.current;
+    if (outfit.length === w.length && outfit.every((l, i) => l.image === w[i].image)) return;
+    console.info("[orbis] outfit changed: putting it on the live video");
+    void live.current.wear(outfit);
+  }, [outfit, dressing, ready, switching, started]);
 
   // Restart the live video from the outfit photo, in the place the double is now.
   const restaged = useRef(new Map<string, string>()); // "photo|place" → photo with that background
